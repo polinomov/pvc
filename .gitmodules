@@ -1,0 +1,4 @@
+[submodule "place-for-submod"]
+	path = place-for-submod
+	url = ../submodule-test
+	branch = master
