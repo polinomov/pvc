@@ -38,6 +38,7 @@ R""(
     const uint msk_v = (1 << (32 - cZbuffBits)) -1 ;
     Partition part = partitions[gl_GlobalInvocationID.y];
 
+	/*
     uint lodLevel = globs.wrkLoad;
     vec4 vc = World2View  * vec4(part.cx, part.cy, part.cz, 1.0) ;
 	
@@ -54,11 +55,16 @@ R""(
         uint dd = uint( sqrt(ddx*ddx + ddy*ddy));
         lodLevel = clamp( dd, 1, uint(globs.wrkLoad));
     }
+	*/
+	
+
+	uint lodLevel = part.lod;
 
     uint offset = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * gl_WorkGroupSize.x * globs.wrkLoad;
+
     for( int loc = 0; loc < lodLevel; loc++, offset += gl_WorkGroupSize.x)
     {
-        RenderPoint pt = inputPoints[offset] ;
+		RenderPoint pt = inputPoints[offset] ;
         uint color = pt.w;
         vec4 vf =    World2View  * vec4(pt.x, pt.y, pt.z, 1.0) ;
         if( (vf.z > 0.0) && (vf.z < 1.0) && ( vf.x < globs.screenX *vf.w ) && ( vf.y < globs.screenY * vf.w) &&(vf.x>0.0) &&(vf.y>0.0)  )

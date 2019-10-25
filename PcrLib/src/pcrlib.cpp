@@ -15,6 +15,7 @@
 #include "OpenGL/shaders/render-points.cs.glsl"
 #include "OpenGL/shaders/post-proc.cs.glsl"
 #include "OpenGL/shaders/post-proc-ptsize.cs.glsl"
+#include "OpenGL/shaders/lod.cs.glsl"
 #include "OpenGL/shaders/ginclude.h"
 
 namespace pcrlib 
@@ -52,6 +53,7 @@ extern int InitGLBlit();
 		ICShader *m_csPostProcXyz = NULL;
 		ICShader *m_csPostProcInt = NULL;
 		ICShader *m_csPostProcPtSize = NULL;
+		ICShader *m_csLod = NULL;
 
 		ThePcrLib() 
 		{
@@ -101,7 +103,13 @@ extern int InitGLBlit();
 			m_csPostProcInt = initShaderInternal(cs_postproc_int.c_str());
 			m_csPostProcRgb = initShaderInternal(cs_postproc_rgb.c_str());
 			m_csPostProcPtSize = initShaderInternal(cs_postproc_ptsize.c_str());
-
+			m_csLod = initShaderInternal(cs_lod.c_str());
+			// Check work group size for some shaders
+			int sx = m_csLod->getSX();
+			if ((sx & 63) || (sx < 64)) 
+			{
+				m_pcallback->error("Group size for m_csLod shader is not integer of 64");
+			}
 			// buffers
 			m_bufferParams = createICBuffer();
 			m_bufferParams->allocate(sizeof(GlobalParams));
@@ -199,9 +207,20 @@ extern int InitGLBlit();
 			// clean dst zMap buffer
 			m_csCleanRGB->execute(sMaxW / 32, sMaxH / 32, 1, { m_bufferParams, m_bufferZMap });
 
-			// Render points
+			
 			if (m_pst->IsReady())
 			{
+				// lod
+				for (int m = 0; m < m_pst->GetNumBuffersInUse(); m++)
+				{
+					ICBuffer *pPartitions = m_pst->GetPartitionBuffer(m);
+					int numParts = m_pst->GetNumPartitionsInBufferAligned(m);
+					uint num_groups_x = 1;
+					uint num_groups_y = numParts / 64;
+					m_csLod->execute(num_groups_x, num_groups_y, 1, { m_bufferParams ,pPartitions,m_bufferMatrView4x4,m_bufferDebug });
+				}
+
+				// Render points
 				for (int m = 0; m < m_pst->GetNumBuffersInUse(); m++)
 				{
 					ICBuffer *pPoints = m_pst->GetPointBuffer(m);

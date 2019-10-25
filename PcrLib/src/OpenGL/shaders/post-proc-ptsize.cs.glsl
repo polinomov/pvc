@@ -18,7 +18,7 @@ R""(
 	const int ptSz = int(globs.pointSize);
 	const int rad = (ptSz==1) ? 2:ptSz*ptSz;
 	uint shift = xx +  ww* yy;
-	if(( xx < ww-ptSz-1) && (yy< hh-ptSz-1) && ( xx>ptSz+1) && ( yy>ptSz+1) ) 
+	if(( xx < ww-ptSz) && (yy< hh-ptSz) && ( xx>ptSz) && ( yy>ptSz) ) 
 	{
  		 uint f_shift = shift;
 		 uint zz = pointZ[shift];
@@ -37,6 +37,9 @@ R""(
 		     }
 		 }
 		 bufferOut[shift] = pointColor[f_shift];
+	}
+	else{
+	  bufferOut[shift] = 0;//bkg color
 	}
 	
  }  

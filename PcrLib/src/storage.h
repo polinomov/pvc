@@ -44,6 +44,8 @@ namespace pcrlib
 		virtual ICBuffer * GetPointBuffer(int n) = 0;
 		virtual ICBuffer * GetPartitionBuffer(int n) = 0;
 		virtual int GetNumPointsInBuffer(int n) = 0;
+		virtual int GetNumPartitionsInBuffer(int n) = 0;
+		virtual int GetNumPartitionsInBufferAligned(int n) = 0;
 		virtual bool IsReady() = 0;
 		virtual float GetXMin() = 0;
 		virtual float GetYMin() = 0;

@@ -11,6 +11,7 @@
 
 #include "windows.h"
 #include <chrono>
+#include <string>
 #include "CommCtrl.h"
 #include <SDL_syswm.h>
 #include "../app/app-events.h"
@@ -65,6 +66,8 @@ void OnEndLoop()
 	sNtimes--;
 	if (sNtimes <= 0) {
 		//std::cout << ((float)sDiff/32000.0f) << "ms\n";
+		float fr = (float)sDiff / 32000.0f;
+		if (sApp) sApp->displayString(std::string("\rFrame Rate: " + std::to_string(fr)).c_str() );
 		sNtimes = 32;
 		sDiff = 0;
 	}

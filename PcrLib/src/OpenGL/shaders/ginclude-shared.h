@@ -63,7 +63,7 @@ DECLARE_STRUCT_AS_STRING(cs_const_val,
 		 uint first;
 		 uint last;
 		 uint ndx;
-		 float pad1;
+		 uint lod;
 	 };);
 
  DECLARE_STRUCT_AS_STRING(cs_struct_font_chars, 

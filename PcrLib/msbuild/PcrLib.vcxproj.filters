@@ -51,5 +51,8 @@
     <None Include="..\src\OpenGL\shaders\post-proc-ptsize.cs.glsl">
       <Filter>GLShaders</Filter>
     </None>
+    <None Include="..\src\OpenGL\shaders\lod.cs.glsl">
+      <Filter>GLShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

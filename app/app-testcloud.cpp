@@ -41,7 +41,7 @@ namespace pcrapp
 			for (int x = 0; x < w; x++)
 			{
 				unsigned int c =(x>w/2) ? 255 :65535;
-				float zf = (y == 0) ? 0.1f : 0.0f;
+				float zf = (y == 0) ? 10.1f : 0.0f;
 				pLib->addPoint((float)x - xc, (float)y- yc, zf, c);
 			}
 		}

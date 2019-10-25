@@ -19,14 +19,15 @@ namespace pcrlib
 		class PointStorageImpl : public PointStorage
 		{
 		public:
-            std::atomic_bool m_wrkStart;// = false;
-            std::atomic_bool m_wrkDone;// = true;
+            std::atomic_bool m_wrkStart;
+            std::atomic_bool m_wrkDone;
 			static const int sMaxBuffs = 32;
 			static const int sMaxAllocSize = 1024 * 1024 * 128;
 			LibCallback *m_cb = new LibCallback();
 			int maxPointsInBuff = 0;
 			int numPointsInBuff[sMaxBuffs];
 			int numPartitionsInBuff[sMaxBuffs];
+			int numPartitionsInBuffAligned64[sMaxBuffs];
 			ICBuffer* bufferPoints[sMaxBuffs];
 			ICBuffer* bufferPartition[sMaxBuffs];
 			BdBox<float>  bdGlob;
@@ -48,6 +49,7 @@ namespace pcrlib
 
 			Partition *pPartitions = NULL;
 			int numPartitions = 0;
+			int numPartitionsAligned64 = 0;
 
 			int sizeInTemp;
 			unsigned int maxBuffSz;
@@ -70,7 +72,8 @@ namespace pcrlib
 				for (int i = 0; i < sMaxBuffs; i++)
 				{
                     numPointsInBuff[i] = 0;
-                    numPartitionsInBuff[i] = 0;
+					numPartitionsInBuff[i] = 0;
+					numPartitionsInBuffAligned64[i] = 0;
 					bufferPoints[i] = NULL;
 					bufferPartition[i] = NULL;
 				}
@@ -132,8 +135,8 @@ namespace pcrlib
 					pPartitions[numPartitions].ndx = numPartitions;
 					//report progress
 					{
-						m_cb->message(("\rProcessing:" + std::to_string(totalProgress)).c_str());
-						totalProgress += 4096;
+						//m_cb->message(("\rProcessing:" + std::to_string(totalProgress)).c_str());
+						//totalProgress += 4096;
 					}
 					numPartitions++;
 
@@ -150,10 +153,32 @@ namespace pcrlib
 							pPt[k2] = ptTemp;
 						}
 					}
-
 				};
 
+				//Add fake points before partitioning.  Total number should be divisible by 4096.
+				if (numPointsInTemp)
+				{
+					unsigned int num_new = (numPointsInTemp + 4095)&(~4095);
+					RenderPoint *pPt = (RenderPoint*)pTemp;
+					for (int k = numPointsInTemp; k< num_new; k++) 
+					{
+						pPt[k] = pPt[numPointsInTemp - 1];
+					}
+					numPointsInTemp = num_new;
+					sizeInTemp = numPointsInTemp * sizeof(RenderPoint);
+				}
+
+				// Do partitioning. Will call OnDonePartition() for every  4096 points.
 				DoPartitionXYZW_Float(pTemp, numPointsInTemp, OnDonePartition);
+
+				//
+				numPartitionsAligned64 = (numPartitions + 63) & (~63);
+				for (int k = numPartitions; k < numPartitionsAligned64; k++)
+				{
+					pPartitions[k] = pPartitions[numPartitions - 1];
+				}
+
+
 				// Wait for GL thread to call initGlBuffers() 
 				m_wrkDone = false;
 				m_wrkStart = true;
@@ -178,13 +203,14 @@ namespace pcrlib
 				bufferPoints[numInUse] = createICBuffer();
 				bufferPoints[numInUse]->allocate(sizeInTemp);
 				bufferPoints[numInUse]->setData(pTemp, sizeInTemp);
-
+				
 				bufferPartition[numInUse] = createICBuffer();;
-				bufferPartition[numInUse]->allocate(numPartitions * sizeof(Partition));
-				bufferPartition[numInUse]->setData(pPartitions, numPartitions * sizeof(Partition));
+				bufferPartition[numInUse]->allocate(numPartitionsAligned64 * sizeof(Partition));
+				bufferPartition[numInUse]->setData(pPartitions, numPartitionsAligned64 * sizeof(Partition));
 
 				numPointsInBuff[numInUse] = numPointsInTemp;
 				numPartitionsInBuff[numInUse] = numPartitions;
+				numPartitionsInBuffAligned64[numInUse] = numPartitionsAligned64;
 				numInUse++;
 
 				m_wrkStart = false;
@@ -228,6 +254,16 @@ namespace pcrlib
 			int GetNumPointsInBuffer(int n)
 			{
 				return numPointsInBuff[n];
+			}
+			
+			int GetNumPartitionsInBuffer(int n)
+			{
+				return numPartitionsInBuff[n];
+			}
+
+			int GetNumPartitionsInBufferAligned(int n)
+			{
+				return numPartitionsInBuffAligned64[n];
 			}
 
 			int GetNumBuffersInUse()

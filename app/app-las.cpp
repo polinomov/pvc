@@ -170,7 +170,7 @@ namespace pcrapp
 	int readLasFile(const char *pPath, pcrlib::IPcrLib *pLib, pcrlib::LibCallback *pCb)
 	{
 		std::string str(pPath);
-		pCb->message("Openinglas file... ");
+		pCb->message("Opening las file... ");
 		return ReadLas(str,pLib, pCb);
 	}
 }//namespace pcrapp
