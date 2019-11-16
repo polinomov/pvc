@@ -7,18 +7,18 @@
 #include "OpenGL/shaders/ginclude.h"
 #include "OpenGL/shaders/render-font.cs.glsl"
 
-namespace pcrlib 
+namespace pcrlib
 {
 
-    static const uint8_t fontSrc[95*7] = {
-        0,    0,   0,   0,   0,   0,   0, // ' '  32
-        0,    6,  95,  95,   6,   0,   0, // '!'  33
-        0,    7,   7,   0,   7,   7,   0, // '"'  34
-        20, 127, 127,  20, 127, 127,  20, // '#'  35
-        36,  46, 107, 107,  58,  18,   0, // '$'  36
-        70, 102,  48,  24,  12, 102,  98, // '%'  37
-        48, 122,  79,  93,  55, 122,  72, // '&'  38
-        4,    7,   3,   0,   0,   0,   0, // '''  39
+	static const uint8_t fontSrc[95 * 7] = {
+		0,    0,   0,   0,   0,   0,   0, // ' '  32
+		0,    6,  95,  95,   6,   0,   0, // '!'  33
+		0,    7,   7,   0,   7,   7,   0, // '"'  34
+		20, 127, 127,  20, 127, 127,  20, // '#'  35
+		36,  46, 107, 107,  58,  18,   0, // '$'  36
+		70, 102,  48,  24,  12, 102,  98, // '%'  37
+		48, 122,  79,  93,  55, 122,  72, // '&'  38
+		4,    7,   3,   0,   0,   0,   0, // '''  39
 		0,   28,  62,  99,  65,   0,   0, // '('  40
 		0,   65,  99,  62,  28,   0,   0, // ')'  41
 		8,   42,  62,  28,  28,  62,  42, // '*'  42
@@ -111,8 +111,8 @@ namespace pcrlib
 	class FontRender : public IFontRenderer
 	{
 	public:
-        static const int m_numSym = 95;
-        static const int m_charsInSym = 7;
+		static const int m_numSym = 95;
+		static const int m_charsInSym = 7;
 		static const int m_fontW = 8;
 		static const int m_fontH = 8;
 		static const int m_maxChars = 65000;
@@ -129,14 +129,14 @@ namespace pcrlib
 
 	IFontRenderer * IFontRenderer::getInstance()
 	{
-        FontRender *pRet =  new  FontRender();
+		FontRender *pRet = new  FontRender();
 		pRet->initFont();
 		return pRet;
 	}
 
-	void IFontRenderer::release(IFontRenderer **ppIfr) 
+	void IFontRenderer::release(IFontRenderer **ppIfr)
 	{
-		if (*ppIfr) 
+		if (*ppIfr)
 		{
 			FontRender *pfr = static_cast<FontRender*>(*ppIfr);
 			pfr->releaseFont();
@@ -149,20 +149,20 @@ namespace pcrlib
 		unsigned int imgSize = m_fontW * m_fontH *m_numSym * sizeof(int);
 		unsigned char *pPix = new unsigned char[imgSize];
 		memset(pPix, 0, imgSize);
-		for (int i = 0; i < m_numSym; i++) 
+		for (int i = 0; i < m_numSym; i++)
 		{
 			unsigned int *pSym = (unsigned int *)pPix;
 			pSym += i * m_fontH *m_fontW;
 			for (int y = 0; y < m_fontH; y++)
 			{
-				for (int x = 0; x < m_fontW-1; x++)
+				for (int x = 0; x < m_fontW - 1; x++)
 				{
-                    uint8_t dc = fontSrc[i* m_charsInSym + x];
+					uint8_t dc = fontSrc[i* m_charsInSym + x];
 					int vl = dc & (1 << y);
 					int bt = (vl == 0) ? 0 : 1;
-					int xx = m_fontW - x -1;
-					int yy = m_fontH - y -1;
-					pSym[yy + xx * m_fontW] = (bt ==1) ? 1 : 0;
+					int xx = m_fontW - x - 1;
+					int yy = m_fontH - y - 1;
+					pSym[yy + xx * m_fontW] = (bt == 1) ? 1 : 0;
 				}
 			}
 		}
@@ -170,7 +170,7 @@ namespace pcrlib
 		m_fontImg = createICBuffer();
 		m_fontImg->allocate(imgSize);
 		m_fontImg->setData(pPix, imgSize);
-        delete[] pPix;
+		delete[] pPix;
 
 		m_pCharsXY = new FontChars[m_maxChars];
 		m_numCharsToRender = 0;
@@ -182,7 +182,7 @@ namespace pcrlib
 		setString("   PRESS SPACE TO SHOW HELP   ", 20, 20);
 		setString("                              ", 20, 28);
 		setString("   Point Size=1 PgUp/PgDn     ", 20, 36);
-	    */
+		*/
 
 		m_fontShader = createICShader();
 		m_fontShader->initFromSource(cs_render_font8x8.c_str());
@@ -193,7 +193,7 @@ namespace pcrlib
 		unsigned int xStart = x;
 		for (const char *ps = pStr; *ps; ps++)
 		{
-			unsigned char symIndex = *ps-32;
+			unsigned char symIndex = *ps - 32;
 			if (m_numCharsToRender < m_maxChars) {
 				FontChars  *pD = m_pCharsXY + m_numCharsToRender;
 				pD->x = xStart;
@@ -212,7 +212,7 @@ namespace pcrlib
 
 	void FontRender::renderFont(ICBuffer *pDst, ICBuffer *pGlob)
 	{
-		if (m_numCharsToRender == 0) 
+		if (m_numCharsToRender == 0)
 		{
 			return;
 		}
@@ -223,7 +223,7 @@ namespace pcrlib
 
 	void FontRender::releaseFont()
 	{
-	
+
 	}
 
 }// namespace pcrlib 
