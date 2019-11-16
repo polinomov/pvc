@@ -1,6 +1,8 @@
 #include "math.h"
 #include "stdlib.h"
+#include <string>
 #include "../PcrLib/pcrlib.h"
+#include "./data/bunny.h"
 
 namespace pcrapp
 {
@@ -30,24 +32,96 @@ namespace pcrapp
 			}
 		}
 	}
+
+	
 #endif
-	void generateWave(int w, int h, pcrlib::IPcrLib* pLib)
+
+	
+
+	static int total_points = 0;
+	static void addBunny(float cx, float cy, float cz, pcrlib::IPcrLib* pLib,unsigned  int col,float sc)
 	{
-		float xc = 0.5f*(float)(w - 1);
-		float yc = 0.5f*(float)(h - 1);
-	
-		for (int y = 0; y < h; y++)
+		static int n_call = 0;
+		float ySzie = 0.154334;
+		int numFloats = sizeof(bunny_points) / sizeof(float);
+		int skip_ndx = 1;
+		unsigned char val = rand() & 0xFF;
+		float ang =  (float)val;
+		float sinF = (float)sin(ang);
+		float cosF = (float)cos(ang);
+		float *pt = bunny_points;
+		for (int i = 0; i < numFloats; i += 3 * skip_ndx)
 		{
-			for (int x = 0; x < w; x++)
-			{
-				unsigned int c =(x>w/2) ? 255 :65535;
-				float zf = (y == 0) ? 10.1f : 0.0f;
-				pLib->addPoint((float)x - xc, (float)y- yc, zf, c);
-			}
+			float xr = pt[0] * cosF + pt[2] * sinF;
+			float yr = pt[1] ;
+			float zr = -pt[0] * sinF + pt[2] * cosF;
+			float xf = xr * sc + cx;
+			float yf = yr * sc + cy + ySzie*sc*0.5f;
+			float zf = zr * sc + cz;
+			pLib->addPoint(xf, zf, yf, col);
+			total_points++;
+			pt += 3 * skip_ndx;
 		}
-	
-	
+		n_call++;
 	}
 
+	static void prepareData(int w, int h, pcrlib::IPcrLib* pLib, pcrlib::LibCallback *pCb)
+	{
+		int numFloats = sizeof(bunny_points) / sizeof(float);
+		//Get bdbox
+		float *pt = bunny_points;
+		float x_min = pt[0], x_max = pt[0];
+		float y_min = pt[1], y_max = pt[1]; 
+		float z_min = pt[2], z_max = pt[2];
+		for (int i = 0; i < numFloats; i += 3,pt+=3 ) 
+		{
+			if (pt[0] < x_min) x_min = pt[0];
+			if (pt[1] < y_min) y_min = pt[1];
+			if (pt[2] < z_min) z_min = pt[2];
+			if (pt[0] > x_max) x_max = pt[0];
+			if (pt[1] > y_max) y_max = pt[1];
+			if (pt[2] > z_max) z_max = pt[2];
+		}
+
+		//printf("%f %f %f %f %f %f \n", x_min, x_max, y_min, y_max, z_min, z_max);
+		//printf("ysize =%f\n ", y_max - y_min);
+		
+		float cx = (x_min + x_max) *0.5f;
+		float cy = (y_min + y_max) *0.5f;
+		float cz = (z_min + z_max) *0.5f;
+		pt = bunny_points;
+		for (int i = 0; i < numFloats; i += 3, pt += 3)
+		{
+			pt[0] -= cx;
+			pt[1] -= cy;
+			pt[2] -= cz;
+		}
+	}
+
+	void generateWave(int w, int h, pcrlib::IPcrLib* pLib, pcrlib::LibCallback *pCb)
+	{
+		prepareData(w, h, pLib, pCb);
+		unsigned int floorColor =  15 | (15 << 5) | (15 << 10);
+		srand(12345);
+		float step = 0.3f;
+		for (int y = 0; y < 60; y++) {
+			for (int x = 0; x < 60; x++) {
+				unsigned int color = rand() & 0xFFFF;
+				float scale = 0.25f +(float)(rand() & 0xFF) / 255.0f;
+				addBunny((float)x*step, 0.0f, (float)y*step, pLib,color,scale);
+
+				float xb = (float)x*step;
+				float yb = (float)y*step;
+				for (int t = 0; t < 100; t++) {
+					float pp1 = (float)(rand() & 0xFF) / 255.0f;
+					float pp2 = (float)(rand() & 0xFF) / 255.0f;
+					pLib->addPoint(xb + step * pp1,  yb + step * pp2, 0.0f, floorColor);
+					total_points++;
+				}
+			}
+		}
+		
+		pCb->message(std::string("\n NUMBER OF POINTS: " + std::to_string(total_points) + "\n").c_str());
+	}
 
 }//namespace pcrapp

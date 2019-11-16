@@ -84,7 +84,7 @@ R""(
 
 		}else
 		{
-            zMapOut[shift] = 0x00202020; // bkg color
+            zMapOut[shift] = 0x00402020; // bkg color
 		}
 	}
  }  

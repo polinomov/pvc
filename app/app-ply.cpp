@@ -112,7 +112,7 @@ namespace pcrapp
 
 	int readPlyFile(const char *pPath, pcrlib::IPcrLib *pLib, pcrlib::LibCallback *pCb)
 	{
-	
+
 		pCb->message("Opening ply file...\n ");
 		std::ifstream fs(pPath, std::ifstream::binary);
 		if (!fs.is_open())
@@ -125,13 +125,13 @@ namespace pcrapp
 		std::vector<std::string> hdr;
 		while (std::getline(fs, line))
 		{
-			if (line.back() == '\r')  line.erase(line.length() -1);
+			if (line.back() == '\r')  line.erase(line.length() - 1);
 			hdr.push_back(line);
 			if (line == "end_header") break;
 		}
 		int data_start = fs.tellg();
 		//Sanity check
-		if (hdr[0] != "ply") 
+		if (hdr[0] != "ply")
 		{
 			pCb->message("Can not find magic ply\n");
 			fs.close();
@@ -147,20 +147,20 @@ namespace pcrapp
 		//Parse header
 		int num_verts = -1;
 		std::vector<PlyRecordI*> propV;
-		bool isVertElement = false,isError = false,isAscii = false,isBigEndian = false;
+		bool isVertElement = false, isError = false, isAscii = false, isBigEndian = false;
 		for (std::vector<std::string>::size_type i = 0; i != hdr.size(); i++)
 		{
 			std::stringstream sts(hdr[i]);
 			std::vector<std::string> words;
 			std::string word;
-			while (std::getline(sts, word, ' ')) { if (word.length() >0) words.push_back(word); }
+			while (std::getline(sts, word, ' ')) { if (word.length() > 0) words.push_back(word); }
 			if (words[0] == "format")
 			{
 				if (words[1] == "ascii") isAscii = true;
 				else if (words[1] == "binary_big_endian")     isBigEndian = true;
 				else if (words[1] == "binary_little_endian")  isBigEndian = false;
-				else { 
-					pCb->message(("ERROR: unknown format " + words[1] +"\n").c_str());
+				else {
+					pCb->message(("ERROR: unknown format " + words[1] + "\n").c_str());
 					isError = true;
 				}
 			}
@@ -170,25 +170,25 @@ namespace pcrapp
 					num_verts = std::stoi(words[2], NULL, 10);
 					isVertElement = true;
 				}
-				else { 
+				else {
 					isVertElement = false;
 				}
 			}
-			else if(  (words[0] == "property") && (isVertElement) )
+			else if ((words[0] == "property") && (isVertElement))
 			{
 				PlyRecordI *plir = NULL;
-				if (words[2] == "x")          { plir = getReader<0>(words[1]); }
-				else if (words[2] == "y")     { plir = getReader<1>(words[1]); }
-				else if (words[2] == "z")     { plir = getReader<2>(words[1]); }
-				else if (words[2] == "red")   { plir = getReader<3>(words[1]); }
+				if (words[2] == "x") { plir = getReader<0>(words[1]); }
+				else if (words[2] == "y") { plir = getReader<1>(words[1]); }
+				else if (words[2] == "z") { plir = getReader<2>(words[1]); }
+				else if (words[2] == "red") { plir = getReader<3>(words[1]); }
 				else if (words[2] == "green") { plir = getReader<4>(words[1]); }
-				else if (words[2] == "blue")  { plir = getReader<5>(words[1]); }
-				else                              {
+				else if (words[2] == "blue") { plir = getReader<5>(words[1]); }
+				else {
 					plir = getReader<-1>(words[1]);
-					pCb->message(("Ignored property:" + words[2] + "\n").c_str() );
+					pCb->message(("Ignored property:" + words[2] + "\n").c_str());
 				}
 				if (plir == NULL) {
-					pCb->message(("ERROR: unknown vertex type: " + words[1] +"\n").c_str());
+					pCb->message(("ERROR: unknown vertex type: " + words[1] + "\n").c_str());
 					isError = true;
 				}
 				else {
@@ -202,22 +202,35 @@ namespace pcrapp
 			return -1;
 		}
 
+		//FILE *f_temp;
+		//fopen_s(&f_temp, "C:\\Dev\\points.dat", "wt");
+	
+
 		// read data
 		float res[6]; //x,y,z,r,g,b
 		size_t ss = 0;
 		for (std::vector<PlyRecordI*>::iterator it = propV.begin(); it != propV.end(); ++it) ss += ((PlyRecordI*)(*it))->get_size();
-		for (int n = 0; n < num_verts; n++) 
+		for (int n = 0; n < num_verts; n++)
 		{
 			PlyRecordI::begin_line(isAscii, (int)ss, fs);
 			for (std::vector<PlyRecordI*>::iterator it = propV.begin(); it != propV.end(); ++it)
 			{
 				PlyRecordI *pr = *it;
-				pr->read_line(res,isAscii, isBigEndian);
+				pr->read_line(res, isAscii, isBigEndian);
 			}
-			if((n % 1023)==0) pCb->message(("\rProcessing:" + std::to_string(n) ).c_str());
+			if ((n % 1023) == 0) pCb->message(("\rProcessing:" + std::to_string(n)).c_str());
 
 			pLib->addPoint(res[0], -res[1], res[2], 65535);
+			
+			/*
+			if (f_temp != NULL) {
+				fprintf(f_temp, "%f,%f,%f,\n", res[0],res[1],res[2]);
+			}
+			*/
 		}
+
+		//if (f_temp != NULL) { fclose(f_temp); }
+	
 
 		fs.close();
 		for (std::vector<PlyRecordI*>::iterator it = propV.begin(); it != propV.end(); ++it) 

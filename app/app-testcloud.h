@@ -4,7 +4,7 @@
 
 namespace pcrapp
 {
-	void generateWave(int w, int h,pcrlib::IPcrLib *pLib);
+	void generateWave(int w, int h,pcrlib::IPcrLib *pLib, pcrlib::LibCallback *pCb);
 }
 
 #endif

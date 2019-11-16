@@ -208,7 +208,7 @@ namespace pcrapp
 	void AppEventsImpl::testCloudAsync(AppEventsImpl *pEnvClass)
 	{
 		    pEnvClass->m_pRLib->startAddPoints();
-			generateWave(256, 256, pEnvClass->m_pRLib);
+			generateWave(256, 256, pEnvClass->m_pRLib, pEnvClass->m_cb);
 			pEnvClass->m_pRLib->doneAddPoints();
 			pEnvClass->setDefCamera();
             pEnvClass->m_renderParam.cm = pcrlib::Colos_model_rgb;
