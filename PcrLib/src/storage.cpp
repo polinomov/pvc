@@ -21,7 +21,7 @@ namespace pcrlib
 		public:
             std::atomic_bool m_wrkStart;
             std::atomic_bool m_wrkDone;
-			static const int sMaxBuffs = 32;
+			static const int sMaxBuffs = 64;
 			static const int sMaxAllocSize = 1024 * 1024 * 128;
 			LibCallback *m_cb = new LibCallback();
 			int maxPointsInBuff = 0;
@@ -135,8 +135,8 @@ namespace pcrlib
 					pPartitions[numPartitions].ndx = numPartitions;
 					//report progress
 					{
-						//m_cb->message(("\rProcessing:" + std::to_string(totalProgress)).c_str());
-						//totalProgress += 4096;
+						m_cb->message(("\rProcessing:" + std::to_string(totalProgress)).c_str());
+						totalProgress += 4096;
 					}
 					numPartitions++;
 

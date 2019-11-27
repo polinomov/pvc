@@ -52,7 +52,7 @@ namespace pcrlib
 	}
 
 	template<typename T>
-    void Separate(T *pData, unsigned int firstIn, unsigned int lastIn, unsigned int nval, unsigned int pivotIndexIn, compFuncType comp, int /*nn*/)
+	void Separate(T *pData, unsigned int firstIn, unsigned int lastIn, unsigned int nval, unsigned int pivotIndexIn, compFuncType comp, int /*nn*/)
 	{
 		// test
 		//printf("Input: fist=%d lastIn=%d nval=%d hint = %d nn = %d\n ",firstIn,lastIn, nval, pivotIndexIn,nn);
@@ -213,7 +213,7 @@ namespace pcrlib
 		}
 		///////
 
-		std::cout << "building group" << std::endl;
+		//std::cout << "building group" << std::endl;
 		BuildGroups<point4f>((point4f*)pData, 0, num - 1, compFuncXYZ, func);
 
 

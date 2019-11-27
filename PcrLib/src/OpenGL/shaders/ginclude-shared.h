@@ -42,6 +42,7 @@ DECLARE_STRUCT_AS_STRING(cs_const_val,
 		float camUpx;
 		float camUpy;
 		float camUpz;
+		float norm[20]; 
 	};);
 
  DECLARE_STRUCT_AS_STRING(cs_struct_point,

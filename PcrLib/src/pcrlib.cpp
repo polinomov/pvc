@@ -194,6 +194,8 @@ extern int InitGLBlit();
 			m_Glob.camUpx = cam.up[0];
 			m_Glob.camUpy = cam.up[1];
 			m_Glob.camUpz = cam.up[2];
+			GetFrustumNormals(cam.up, cam.lookAt, cam.fovInGrads, m_Glob.norm);// sets m_Glob.norm
+
 			m_bufferParams->setData((unsigned char*)(&m_Glob), sizeof(GlobalParams));
 
 			// camera
@@ -207,7 +209,6 @@ extern int InitGLBlit();
 			// clean dst zMap buffer
 			m_csCleanRGB->execute(sMaxW / 32, sMaxH / 32, 1, { m_bufferParams, m_bufferZMap });
 
-			
 			if (m_pst->IsReady())
 			{
 				// lod
@@ -218,6 +219,10 @@ extern int InitGLBlit();
 					uint num_groups_x = 1;
 					uint num_groups_y = numParts / 64;
 					m_csLod->execute(num_groups_x, num_groups_y, 1, { m_bufferParams ,pPartitions,m_bufferMatrView4x4,m_bufferDebug });
+					// debug
+					//float res[16];
+					//m_bufferDebug->getData(16 * 4, res);
+					//printf(" %f, %f, %f \n", res[0], res[1], res[2]);
 				}
 
 				// Render points

@@ -8,6 +8,7 @@ namespace pcrlib
 		float *pOut);
 
 	void GetVew2World4x4(const float *m_U, const float *m_D, const float *m_P, float *pOut);
+	void GetFrustumNormals(const float *m_U, const float *m_D, float fov, float *pOut);
 }
 
 #endif

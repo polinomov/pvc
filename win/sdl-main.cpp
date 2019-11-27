@@ -17,7 +17,7 @@
 #include "../app/app-events.h"
 #include "../PcrLib/pcrlib.h"
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH 512
 #define SCREEN_HEIGHT 512
 SDL_GLContext gGlContext;
 static pcrapp::IAppEvents *sApp = NULL;

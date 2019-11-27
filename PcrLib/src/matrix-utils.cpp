@@ -58,7 +58,7 @@ namespace pcrlib
 							 float *pOut)
 	{
 		memset(pOut, 0, 16 * sizeof(float));
-		float W2V[16], SP[16];
+		float W2V[16];
 		float toScreen[4][4];
 		float screenX = screenPixX;
 		float screenY = screenPixY;
@@ -120,6 +120,43 @@ namespace pcrlib
 		pOut[13] = m_P[1];
 		pOut[14] = m_P[2];
 		pOut[15] = 1.0f;
+	}
+
+	void GetFrustumNormals(const float *m_U, const float *m_D,float fov, float *pOut)
+	{
+		pOut[0] = -m_D[0];
+		pOut[1] = -m_D[1];
+		pOut[2] = -m_D[2];
+		pOut[3] = 0.0f;
+		float ang  = (fov* 3.1415f / 360.0f);
+		float cosa = (float)cos(ang);
+		float sina = (float)sin(ang);
+
+		float rr[3];
+		rr[0] = m_U[1] * m_D[2] - m_U[2] * m_D[1];
+		rr[1] = m_U[2] * m_D[0] - m_U[0] * m_D[2];
+		rr[2] = m_U[0] * m_D[1] - m_U[1] * m_D[0];
+
+		pOut[4] = rr[0] * cosa - m_D[0] * sina;
+		pOut[5] = rr[1] * cosa - m_D[1] * sina;
+		pOut[6] = rr[2] * cosa - m_D[2] * sina;
+		pOut[7] = 0.0f;
+
+		pOut[8] = -rr[0] * cosa - m_D[0] * sina;
+		pOut[9] = -rr[1] * cosa - m_D[1] * sina;
+		pOut[10] = -rr[2] * cosa - m_D[2] * sina;
+		pOut[11] = 0.0f;
+
+		pOut[12] = m_U[0] * cosa - m_D[0] * sina;
+		pOut[13] = m_U[1] * cosa - m_D[1] * sina;
+		pOut[14] = m_U[2] * cosa - m_D[2] * sina;
+		pOut[15] = 0.0f;
+
+		pOut[16] = -m_U[0] * cosa - m_D[0] * sina;
+		pOut[17] = -m_U[1] * cosa - m_D[1] * sina;
+		pOut[18] = -m_U[2] * cosa - m_D[2] * sina;
+		pOut[19] = 0.0f;
+
 	}
 
 	
