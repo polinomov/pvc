@@ -30,7 +30,7 @@ R""(
         float yb = vb.y/vb.w;
         float ddx =xa- xb;
         float ddy =ya-yb;
-        uint dd = uint( sqrt(ddx*ddx + ddy*ddy));
+        uint dd = uint( 0.5f * sqrt(ddx*ddx + ddy*ddy));
         partitions[ndx].lod = clamp( dd, 1, uint(globs.wrkLoad));
     } 
     // globs.px,globs.py,globs.pz - camera position in world;

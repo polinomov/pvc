@@ -5,6 +5,7 @@
 #include <vector>
 #include <thread>
 #include <assert.h>
+#include <math.h>
 #include "../pcrlib.h"
 #include "icompute.h"
 #include "storage.h"

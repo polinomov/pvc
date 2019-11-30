@@ -96,6 +96,12 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override ;
+    //void focusInEvent(QFocusEvent) override;
+    //void focusOutEvent(QFocusEvent) override;
+
+
     // from LibCallback
     void error(const char *pMsg) override;
     void message(const char *pMsg) override;

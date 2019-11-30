@@ -54,4 +54,5 @@ DISTFILES += \
     ../src/OpenGL/wave-test.cs.glsl \
     ../src/OpenGL/shaders/render-points.cs.glsl \
     ../src/OpenGL/shaders/post-proc.cs.glsl \
-    ../src/OpenGL/shaders/render-font.cs.glsl
+    ../src/OpenGL/shaders/render-font.cs.glsl \
+    ../src/OpenGL/shaders/lod.cs.glsl

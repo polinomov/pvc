@@ -105,8 +105,8 @@ namespace pcrapp
 		unsigned int floorColor = 15 | (15 << 5) | (15 << 10);
 		srand(12345);
 		float step = 0.3f;
-		for (int y = 0; y < 50; y++) {
-			for (int x = 0; x < 50; x++) {
+        for (int y = 0; y < 80; y++) {
+            for (int x = 0; x < 80; x++) {
 				unsigned int color = rand() & 0xFFFF;
 				float scale = 0.25f + (float)(rand() & 0xFF) / 255.0f;
 				addBunny((float)x*step, 0.0f, (float)y*step, pLib, color, scale);

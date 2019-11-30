@@ -31,6 +31,7 @@ SOURCES += \
     ../app/app-camera.cpp \
     ../app/app-testcloud.cpp \
     ../app/app-las.cpp \
+    ../app/app-ply.cpp \
     ../app/app-events.cpp
 
 HEADERS += \
@@ -38,6 +39,7 @@ HEADERS += \
     glwidget.h \
     ../app/app-testcloud.h \
     ../app/app-las.h \
+    ../app/app-ply.h \
     ../app/app-events.h \
     ../app/app-camera.h
 

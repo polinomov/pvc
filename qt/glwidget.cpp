@@ -89,6 +89,7 @@ GLWidget::GLWidget(QWidget *parent)
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(200);
+    this->setFocusPolicy(Qt::WheelFocus);
 
 }
 
@@ -144,6 +145,25 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     m_pApp->mouseWhellEvent(delta);
     update();
 }
+
+void GLWidget::keyPressEvent(QKeyEvent *event)
+{
+    if(!m_pApp)  return;
+    if(event->key()==Qt::Key_PageUp )    m_pApp->keyEvent(75,true);
+    if(event->key()==Qt::Key_PageDown )  m_pApp->keyEvent(78,true);
+    update();
+}
+
+void GLWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    if(!m_pApp)  return;
+    if(event->key()==Qt::Key_PageUp )    m_pApp->keyEvent(75,false);
+    if(event->key()==Qt::Key_PageDown )  m_pApp->keyEvent(78,false);
+    update();
+}
+
+
+
 
 void GLWidget::runtest() //slot
 {

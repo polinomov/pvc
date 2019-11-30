@@ -3,6 +3,7 @@
 #include <thread>
 #include <mutex>
 #include <string>
+#include <math.h>
 #include "app-events.h"
 #include "app-camera.h"
 #include "app-testcloud.h"
